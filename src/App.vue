@@ -10,16 +10,31 @@ const todos_asc = computed(()=> todos.value.sort((a,b)=>{
   return a.createdAt - b.createdAt
 }))
 
-watch(name, (newVal)=>{
-  localStorage.setItem('name',newVal);
-})
+
 
 onMounted(()=>{
   name.value = localStorage.getItem('name') || '';
+  todos.value = JSON.parse(localStorage.getItem('todos')) || [];
 })
-const addTodo = ()=>{
-
+const addTodo =()=>{
+  console.log("working ",input_content.value.trim()," ",input_category.value )
+if(input_content.value.trim()=="" || input_category.value==null){
+return;
 }
+todos.value.push({
+  content: input_content.value,
+  category: input_category.value,
+  done: false,
+  createdAt: new Date().getTime()
+})
+}
+
+watch(todos, newVal =>{
+  localStorage.setItem('todos',JSON.stringify(newVal))
+},{deep: true})
+watch(name, (newVal)=>{
+  localStorage.setItem('name',newVal);
+})
 
 </script>
 
@@ -39,7 +54,7 @@ const addTodo = ()=>{
      v-model="input_content">
        <h4>Pick a category</h4>
        <div class="options">
-        <label for="">
+        <label>
           <input type="radio" name="category" 
           value="business"
           v-model="input_category"
@@ -48,7 +63,7 @@ const addTodo = ()=>{
           <div>business</div>
         </label>
 
-        <label for="">
+        <label>
           <input type="radio" name="category" 
           value="personal"
           v-model="input_category"
@@ -57,8 +72,11 @@ const addTodo = ()=>{
           <div>business</div>
         </label>
        </div>
+
+       <input type="submit" value="Add todo">
   </form>
   </section>
+  {{todos_asc}}
   </main>
 
 </template>
